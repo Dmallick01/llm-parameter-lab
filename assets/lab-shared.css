@@ -319,3 +319,56 @@ body.glossary-open .lab-glossary { transform: translateX(0); }
   color: #fff;
   border-color: var(--chover);
 }
+
+.lab-version-badge {
+  padding: 2px 6px;
+  border: 1px solid var(--chover);
+  color: var(--chover);
+  font-size: 10px;
+}
+
+.references-section {
+  margin-bottom: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--c-border);
+}
+
+.references-title {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.references-lead {
+  color: var(--cdisabled);
+  font-size: 12px;
+  margin-bottom: 16px;
+  max-width: 65ch;
+}
+
+.references-group {
+  margin-bottom: 10px;
+  border: 1px solid var(--c-border);
+  padding: 10px 12px;
+}
+
+.references-group summary {
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.references-group ol {
+  margin: 10px 0 0 18px;
+  color: var(--cdisabled);
+}
+
+.references-group a {
+  color: var(--chover);
+}
+
+.site-footer-meta {
+  color: var(--cdisabled);
+  font-size: 12px;
+  margin-top: 16px;
+}
