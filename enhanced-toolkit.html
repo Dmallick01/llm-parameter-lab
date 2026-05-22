@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Interactive Toolkit – Enhanced</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cbg: #ffffff;
+            --ctext: #000000;
+            --cdisabled: #a6a6a6;
+            --chover: #0000ff;
+            --ctrigger: #d6fed0;
+            --font-mono: 'JetBrains Mono', Courier, monospace;
+            --font-sans: 'Inter', Helvetica, Arial, sans-serif;
+            --fs: 13px;
+            --lh: 1.4;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--cbg); color: var(--ctext);
+            font-family: var(--font-mono); font-size: var(--fs);
+            line-height: var(--lh); padding: 40px; max-width: 1400px; margin: 0 auto;
+        }
+        
+        h1, h2, h3 { font-family: var(--font-sans); font-weight: 500; letter-spacing: -0.02em; }
+        h1 { font-size: 32px; margin-bottom: 40px; }
+        
+        .widget {
+            border-top: 1px solid var(--ctext); padding: 40px 0;
+            display: grid; grid-template-columns: 350px 1fr; gap: 60px;
+        }
+        @media (max-width: 900px) { .widget { grid-template-columns: 1fr; gap: 40px; } }
+        
+        .widget-header h2 { font-size: 24px; margin-bottom: 5px; }
+        .widget-header p { color: var(--cdisabled); margin-bottom: 20px; }
+        
+        .controls { display: flex; flex-direction: column; gap: 20px; }
+        .row { display: flex; flex-direction: column; gap: 8px; }
+        .row-header { display: flex; justify-content: space-between; }
+        .row-label { color: var(--cdisabled); font-weight: bold; }
+        
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; height: 1px; background: var(--ctext); outline: none; margin: 10px 0;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 12px; height: 12px; background: var(--cbg);
+            border: 1px solid var(--ctext); border-radius: 50%; cursor: pointer; transition: all 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { background: var(--chover); border-color: var(--chover); }
+        
+        select, input[type=text] {
+            width: 100%; border: 1px solid var(--ctext); background: var(--cbg); color: var(--ctext);
+            font-family: var(--font-mono); font-size: var(--fs); padding: 8px; border-radius: 0; outline: none;
+            appearance: none; cursor: pointer;
+        }
+        select:focus, input[type=text]:focus { border-color: var(--chover); }
+
+        .output-panel { display: flex; flex-direction: column; }
+        .output { background: var(--ctrigger); padding: 15px; border: 1px solid var(--ctext); margin-bottom: 20px; line-height: 1.6; }
+        
+        #search-results { margin-top: 20px; }
+        .result-item { margin-bottom: 10px; cursor: pointer; color: var(--chover); }
+        .result-item:hover { text-decoration: underline; }
+        
+        details { margin-top: 20px; color: var(--ctext); padding: 15px; border: 1px solid var(--ctext); }
+        summary { cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+
+        /* Graph Bars */
+        .bar-chart-container { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .bar-row { display: flex; align-items: center; }
+        .bar-label { width: 120px; color: var(--cdisabled); }
+        .bar-track { flex: 1; height: 1px; background: var(--cdisabled); margin: 0 15px; position: relative; }
+        .bar-fill { position: absolute; left: 0; top: -4px; height: 9px; background: var(--ctext); transition: width 0.3s; }
+        .bar-value { width: 80px; text-align: right; }
+    </style>
+</head>
+<body>
+
+<h1>LLM Interactive Toolkit</h1>
+
+<!-- Search & Quick Research -->
+<div class="widget" id="search-widget">
+    <div class="widget-header">
+        <h2>Search & Quick Research</h2>
+        <p>API retrieval simulation.</p>
+    </div>
+    <div class="controls">
+        <input type="text" id="search-box" placeholder="Type a topic or keyword…">
+        <details>
+            <summary>How it works?</summary>
+            <p>This panel uses the public Wikipedia API to fetch short summaries for your query. It demonstrates how an LLM‑based assistant could retrieve up‑to‑date information before generating a response.</p>
+        </details>
+    </div>
+    <div class="output-panel">
+        <div id="search-results"><i>Type above to search...</i></div>
+    </div>
+</div>
+
+<!-- KV Cache Analyzer -->
+<div class="widget" id="kv-widget">
+    <div class="widget-header">
+        <h2>KV Cache Analyzer</h2>
+        <p>Attention memory profiling.</p>
+    </div>
+    <div class="controls">
+        <div class="row">
+            <div class="row-header"><span class="row-label">Layers (L)</span><span id="val-layers">80</span></div>
+            <input type="range" id="layers" min="1" max="128" value="80">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Heads (H)</span><span id="val-heads">64</span></div>
+            <input type="range" id="heads" min="1" max="256" value="64">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Head Dim (dₕ)</span><span id="val-headDim">128</span></div>
+            <input type="range" id="headDim" min="32" max="512" value="128">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Context (tokens)</span><span id="val-ctx">4096</span></div>
+            <input type="range" id="ctx" min="1" max="32768" value="4096">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Dtype</span></div>
+            <select id="dtype">
+                <option value="float16">float16 (2 B)</option>
+                <option value="bfloat16">bfloat16 (2 B)</option>
+                <option value="int8">int8 (1 B)</option>
+            </select>
+        </div>
+    </div>
+    <div class="output-panel">
+        <div class="output" id="kv-output"></div>
+        <div class="bar-chart-container" id="kv-graph"></div>
+    </div>
+</div>
+
+<!-- Quantization Calibrator -->
+<div class="widget" id="quant-widget">
+    <div class="widget-header">
+        <h2>Quantization Calibrator</h2>
+        <p>Tradeoff analysis.</p>
+    </div>
+    <div class="controls">
+        <div class="row">
+            <div class="row-header"><span class="row-label">Params (B)</span><span id="val-params">70</span></div>
+            <input type="range" id="params" min="1" max="200" value="70">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Bits per Weight</span><span id="val-bits">4</span></div>
+            <input type="range" id="bits" min="2" max="8" value="4">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Context Size</span><span id="val-ctxSize">4096</span></div>
+            <input type="range" id="ctxSize" min="1" max="32768" value="4096">
+        </div>
+    </div>
+    <div class="output-panel">
+        <div class="output" id="quant-output"></div>
+        <div class="bar-chart-container" id="quant-graph"></div>
+    </div>
+</div>
+
+<!-- Sampling Dial -->
+<div class="widget" id="temp-widget">
+    <div class="widget-header">
+        <h2>Sampling Dial</h2>
+        <p>Stochasticity control.</p>
+    </div>
+    <div class="controls">
+        <div class="row">
+            <div class="row-header"><span class="row-label">Temperature</span><span id="val-temp">1.0</span></div>
+            <input type="range" id="temp" min="0.1" max="2" step="0.05" value="1">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Top‑p</span><span id="val-topP">0.95</span></div>
+            <input type="range" id="topP" min="0.5" max="1" step="0.01" value="0.95">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Top‑k</span><span id="val-topK">50</span></div>
+            <input type="range" id="topK" min="10" max="200" value="50">
+        </div>
+    </div>
+    <div class="output-panel">
+        <div class="output" id="temp-output"></div>
+        <div class="bar-chart-container" id="temp-graph"></div>
+    </div>
+</div>
+
+<!-- RLHF Alignment -->
+<div class="widget" id="rlhf-widget">
+    <div class="widget-header">
+        <h2>RLHF Alignment</h2>
+        <p>Policy tuning.</p>
+    </div>
+    <div class="controls">
+        <div class="row">
+            <div class="row-header"><span class="row-label">KL Penalty (β)</span><span id="val-beta">0.05</span></div>
+            <input type="range" id="beta" min="0.01" max="1" step="0.01" value="0.05">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Reward Strength</span><span id="val-reward">1.5</span></div>
+            <input type="range" id="reward" min="0.5" max="3" step="0.1" value="1.5">
+        </div>
+    </div>
+    <div class="output-panel">
+        <div class="output" id="rlhf-output"></div>
+        <div class="bar-chart-container" id="rlhf-graph"></div>
+    </div>
+</div>
+
+<!-- RAG Optimizer -->
+<div class="widget" id="rag-widget">
+    <div class="widget-header">
+        <h2>RAG Optimizer</h2>
+        <p>Retrieval context scaling.</p>
+    </div>
+    <div class="controls">
+        <div class="row">
+            <div class="row-header"><span class="row-label">Top‑K Docs</span><span id="val-kDocs">5</span></div>
+            <input type="range" id="kDocs" min="1" max="20" value="5">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Chunk Size</span><span id="val-chunkSize">512</span></div>
+            <input type="range" id="chunkSize" min="128" max="2048" step="64" value="512">
+        </div>
+        <div class="row">
+            <div class="row-header"><span class="row-label">Corpus Size (M)</span><span id="val-corpusSize">200</span></div>
+            <input type="range" id="corpusSize" min="1" max="1000" value="200">
+        </div>
+    </div>
+    <div class="output-panel">
+        <div class="output" id="rag-output"></div>
+        <div class="bar-chart-container" id="rag-graph"></div>
+    </div>
+</div>
+
+<!-- Scaling Laws -->
+<div class="widget" id="scale-widget">
+    <div class="widget-header">
+        <h2>Scaling Laws</h2>
+        <p>Compute optimization.</p>
+    </div>
+    <div class="controls">
+        <div class="row">
+            <div class="row-header"><span class="row-label">Compute (TFLOP-hrs)</span><span id="val-compute">500</span></div>
+            <input type="range" id="compute" min="1" max="2000" value="500">
+        </div>
+    </div>
+    <div class="output-panel">
+        <div class="output" id="scale-output"></div>
+        <div class="bar-chart-container" id="scale-graph"></div>
+    </div>
+</div>
+
+<script>
+function formatBytes(b) {
+    if (b < 1024*1024) return (b/1024).toFixed(2) + ' KB';
+    if (b < 1024*1024*1024) return (b/(1024*1024)).toFixed(2) + ' MB';
+    return (b/(1024**3)).toFixed(2) + ' GB';
+}
+
+function renderBars(containerId, data) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    data.forEach(({ label, val, max, color }) => {
+        const pct = Math.max(0, Math.min(100, (val / max) * 100));
+        let c = color === 'highlight' ? 'var(--chover)' : 'var(--ctext)';
+        el.innerHTML += `
+            <div class="bar-row">
+                <div class="bar-label">${label}</div>
+                <div class="bar-track"><div class="bar-fill" style="width: ${pct}%; background: ${c}"></div></div>
+                <div class="bar-value">${val.toFixed(1)}</div>
+            </div>`;
+    });
+}
+
+// KV Cache
+const kv = {
+    layers: document.getElementById('layers'),
+    heads: document.getElementById('heads'),
+    headDim: document.getElementById('headDim'),
+    ctx: document.getElementById('ctx'),
+    dtype: document.getElementById('dtype'),
+    out: document.getElementById('kv-output')
+};
+function updateKV() {
+    document.getElementById('val-layers').innerText = kv.layers.value;
+    document.getElementById('val-heads').innerText = kv.heads.value;
+    document.getElementById('val-headDim').innerText = kv.headDim.value;
+    document.getElementById('val-ctx').innerText = kv.ctx.value;
+    
+    const L = +kv.layers.value, H = +kv.heads.value, dH = +kv.headDim.value;
+    const ctx = +kv.ctx.value;
+    const bytesPerWeight = kv.dtype.value === 'int8' ? 1 : 2;
+    const cacheBytes = 2 * L * H * dH * ctx * bytesPerWeight;
+    const maxCache = 2 * 128 * 256 * 512 * 32768 * 2; // theoretical max for the sliders
+    const perf = (ctx > 4096) ? '⚠️ High latency' : '✅ Fast decode';
+    
+    kv.out.innerHTML = 'KV Cache Size: ' + formatBytes(cacheBytes) + '<br>' +
+                       'Per-token KV bytes: ' + ((2 * H * dH * bytesPerWeight) / 1024) + ' KB<br>' +
+                       'Performance: ' + perf;
+                       
+    renderBars('kv-graph', [
+        { label: 'Cache RAM', val: cacheBytes / (1024**3), max: 50, color: 'normal' },
+        { label: 'Context Use', val: ctx, max: 32768, color: 'highlight' }
+    ]);
+}
+kv.layers.oninput = kv.heads.oninput = kv.headDim.oninput = kv.ctx.oninput = kv.dtype.onchange = updateKV;
+updateKV();
+
+// Quantization
+const quant = {
+    params: document.getElementById('params'),
+    bits: document.getElementById('bits'),
+    ctxSize: document.getElementById('ctxSize'),
+    out: document.getElementById('quant-output')
+};
+function updateQuant() {
+    document.getElementById('val-params').innerText = quant.params.value;
+    document.getElementById('val-bits').innerText = quant.bits.value;
+    document.getElementById('val-ctxSize').innerText = quant.ctxSize.value;
+
+    const N = +quant.params.value * 1e9, b = +quant.bits.value;
+    const modelBytes = N * b / 8;
+    const cacheBytes = +quant.ctxSize.value * 2 * 80 * 64 * 128 * (b / 8);
+    const totalGB = (modelBytes + cacheBytes) / 1e9;
+    
+    quant.out.innerHTML = 'Model Size: ' + formatBytes(modelBytes) + '<br>' +
+                          'KV Cache: ' + formatBytes(cacheBytes) + '<br>' +
+                          'Total RAM: ' + totalGB.toFixed(2) + ' GB';
+                          
+    renderBars('quant-graph', [
+        { label: 'Model RAM (GB)', val: modelBytes / 1e9, max: 100, color: 'highlight' },
+        { label: 'Cache RAM (GB)', val: cacheBytes / 1e9, max: 20, color: 'normal' },
+        { label: 'Bitrate', val: b, max: 16, color: 'normal' }
+    ]);
+}
+quant.params.oninput = quant.bits.oninput = quant.ctxSize.oninput = updateQuant;
+updateQuant();
+
+// Temperature
+const temp = {
+    temp: document.getElementById('temp'),
+    topP: document.getElementById('topP'),
+    topK: document.getElementById('topK'),
+    out: document.getElementById('temp-output')
+};
+function updateTemp() {
+    document.getElementById('val-temp').innerText = temp.temp.value;
+    document.getElementById('val-topP').innerText = temp.topP.value;
+    document.getElementById('val-topK').innerText = temp.topK.value;
+
+    const T = +temp.temp.value, p = +temp.topP.value, k = +temp.topK.value;
+    temp.out.innerHTML = 'Temperature: ' + T + '<br>' +
+                         'Top-p: ' + p + '<br>' +
+                         'Top-k: ' + k;
+                         
+    renderBars('temp-graph', [
+        { label: 'Diversity', val: T * 50, max: 100, color: 'highlight' },
+        { label: 'Focus', val: (1 - p) * 100 + (200 - k)/2, max: 150, color: 'normal' }
+    ]);
+}
+temp.temp.oninput = temp.topP.oninput = temp.topK.oninput = updateTemp;
+updateTemp();
+
+// RLHF
+const rlhf = {
+    beta: document.getElementById('beta'),
+    reward: document.getElementById('reward'),
+    out: document.getElementById('rlhf-output')
+};
+function updateRLHF() {
+    document.getElementById('val-beta').innerText = rlhf.beta.value;
+    document.getElementById('val-reward').innerText = rlhf.reward.value;
+
+    const B = +rlhf.beta.value, R = +rlhf.reward.value;
+    rlhf.out.innerHTML = 'KL Penalty (β): ' + B + '<br>' +
+                         'Reward Strength: ' + R;
+                         
+    renderBars('rlhf-graph', [
+        { label: 'Safety (β)', val: B * 100, max: 100, color: 'normal' },
+        { label: 'Helpfulness', val: R * 33, max: 100, color: 'highlight' }
+    ]);
+}
+rlhf.beta.oninput = rlhf.reward.oninput = updateRLHF;
+updateRLHF();
+
+// RAG
+const rag = {
+    kDocs: document.getElementById('kDocs'),
+    chunkSize: document.getElementById('chunkSize'),
+    corpusSize: document.getElementById('corpusSize'),
+    out: document.getElementById('rag-output')
+};
+function updateRag() {
+    document.getElementById('val-kDocs').innerText = rag.kDocs.value;
+    document.getElementById('val-chunkSize').innerText = rag.chunkSize.value;
+    document.getElementById('val-corpusSize').innerText = rag.corpusSize.value;
+
+    const K = +rag.kDocs.value, C = +rag.chunkSize.value, M = +rag.corpusSize.value;
+    const indexGB = (M * 1e6 * C) / 1024**3;
+    const ctxTokens = K * C;
+    
+    rag.out.innerHTML = 'Retrieved Tokens: ' + ctxTokens + '<br>' +
+                        'Index RAM (approx): ' + formatBytes(M * 1e6 * C);
+                        
+    renderBars('rag-graph', [
+        { label: 'Ctx Tokens', val: ctxTokens, max: 40960, color: 'highlight' },
+        { label: 'Index (GB)', val: indexGB, max: 100, color: 'normal' }
+    ]);
+}
+rag.kDocs.oninput = rag.chunkSize.oninput = rag.corpusSize.oninput = updateRag;
+updateRag();
+
+// Scaling
+const scale = {
+    compute: document.getElementById('compute'),
+    out: document.getElementById('scale-output')
+};
+function updateScale() {
+    document.getElementById('val-compute').innerText = scale.compute.value;
+
+    const C = +scale.compute.value;
+    const N_opt = Math.pow(C, 0.5) * 1e6;
+    const D_opt = Math.pow(C, 0.5) * 1e9;
+    
+    scale.out.innerHTML = 'Optimal Params: ' + (N_opt / 1e6).toFixed(2) + ' M<br>' +
+                          'Optimal Tokens: ' + (D_opt / 1e9).toFixed(2) + ' B';
+                          
+    renderBars('scale-graph', [
+        { label: 'Params (M)', val: N_opt / 1e6, max: 50, color: 'highlight' },
+        { label: 'Tokens (B)', val: D_opt / 1e9, max: 50, color: 'normal' }
+    ]);
+}
+scale.compute.oninput = updateScale;
+updateScale();
+
+// Search
+const searchBox = document.getElementById('search-box');
+const resultsDiv = document.getElementById('search-results');
+let timeout = null;
+
+searchBox.addEventListener('input', () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => { performSearch(searchBox.value.trim()); }, 400);
+});
+
+async function performSearch(query) {
+    resultsDiv.innerHTML = '<i>Searching...</i>';
+    if (!query) { resultsDiv.innerHTML = '<i>Type above to search...</i>'; return; }
+    try {
+        const url = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(query);
+        const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (resp.ok) {
+            const data = await resp.json();
+            resultsDiv.innerHTML = '';
+            displayResult(data.title, data.extract, data.content_urls.desktop.page);
+        } else {
+            resultsDiv.innerHTML = 'No results found.';
+        }
+    } catch (e) { resultsDiv.innerHTML = 'Error fetching data.'; }
+}
+
+function displayResult(title, extract, url) {
+    var div = document.createElement('div');
+    div.className = 'result-item';
+    div.innerHTML = '<strong>' + title + '</strong>: ' + extract.substring(0, 150) + '…';
+    div.onclick = function() { window.open(url, '_blank'); };
+    resultsDiv.appendChild(div);
+}
+</script>
+</body>
+</html>
