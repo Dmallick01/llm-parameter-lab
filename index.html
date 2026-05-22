@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LLM Parameter Lab — Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/lab-shared.css">
+  <link rel="stylesheet" href="assets/lab-shared.css?v=2.1.0">
 </head>
 <body class="hub-page hub-body">
   <a href="https://dmallick01.github.io/llm-parameter-lab/" class="hub-badge" title="Live demo on GitHub Pages">
@@ -50,10 +50,12 @@
     </div>
   </section>
 
-  <footer style="margin-top:48px;color:var(--cdisabled);font-size:12px;">
-    MIT License · <a href="https://github.com/Dmallick01/llm-parameter-lab" style="color:var(--chover)">github.com/Dmallick01/llm-parameter-lab</a>
+  <footer id="site-footer" style="margin-top:48px;">
+    <div id="references-section" class="references-section"></div>
+    <p class="site-footer-meta">MIT License · <a href="https://github.com/Dmallick01/llm-parameter-lab" style="color:var(--chover)">github.com/Dmallick01/llm-parameter-lab</a></p>
   </footer>
 
-  <script src="assets/lab-shared.js"></script>
+  <script src="assets/lab-shared.js?v=2.1.0"></script>
+  <script>window.addEventListener('load', function () { if (window.LabShared) LabShared.bootHub(); });</script>
 </body>
 </html>

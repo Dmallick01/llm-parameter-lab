@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Interactive Toolkit – Enhanced</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/lab-shared.css">
+    <link rel="stylesheet" href="assets/lab-shared.css?v=2.1.0">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
     <style>
         :root {
@@ -276,8 +277,12 @@
     </div>
 </div>
 
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="assets/lab-shared.js"></script>
+<footer id="site-footer">
+    <div id="references-section" class="references-section"></div>
+    <p class="site-footer-meta"><a href="index.html" style="color:var(--chover)">Hub</a> · LLM Parameter Lab · MIT</p>
+</footer>
+
+<script src="assets/lab-shared.js?v=2.1.0"></script>
 <script>
 function formatBytes(b) {
     if (b < 1024*1024) return (b/1024).toFixed(2) + ' KB';
@@ -461,21 +466,15 @@ function updateScale() {
 scale.compute.oninput = updateScale;
 updateScale();
 
-if (window.LabShared) {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      window.LabShared.drawChinchilla?.();
-      window.LabShared.drawRagSankey?.();
-    }, 300);
-  });
-  ['layers','heads','headDim','ctx','dtype','kDocs','chunkSize','corpusSize','compute'].forEach((id) => {
+['layers','heads','headDim','ctx','dtype','kDocs','chunkSize','corpusSize','compute'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => {
-      window.LabShared.drawChinchilla?.();
-      window.LabShared.drawRagSankey?.();
+        if (window.LabShared) {
+            window.LabShared.drawChinchilla();
+            window.LabShared.drawRagSankey();
+        }
     });
-  });
-}
+});
 
 // Search
 const searchBox = document.getElementById('search-box');
@@ -510,6 +509,11 @@ function displayResult(title, extract, url) {
     div.onclick = function() { window.open(url, '_blank'); };
     resultsDiv.appendChild(div);
 }
+</script>
+<script>
+window.addEventListener('load', function () {
+    if (window.LabShared) window.LabShared.bootLab();
+});
 </script>
 </body>
 </html>

@@ -89,6 +89,10 @@ flowchart LR
 
 Vanilla JS · HTML5 Canvas · KaTeX · CSS variables · optional Vite bundle
 
+## References
+
+Widget math and copy are informed by published work (Chinchilla, RAG, RLHF, quantization, etc.). See [docs/REFERENCES.md](docs/REFERENCES.md) or the **Research references** section in each page footer.
+
 ## License
 
 MIT

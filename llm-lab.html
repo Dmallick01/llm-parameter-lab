@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Systems Laboratory</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/lab-shared.css">
+    <link rel="stylesheet" href="assets/lab-shared.css?v=2.1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
     <style>
         :root {
             --cbg: #ffffff;
@@ -336,7 +337,7 @@
 
     <header>
         <h1>LLM Parameter Lab</h1>
-        <p class="subtitle">Interactive simulations for PhD-level Large Language Model architectures. Adjust parameters, analyze live mathematics, and calibrate hardware requirements.</p>
+        <p class="subtitle">Interactive simulations for LLM systems — v2 adds presets, challenge mode, Chinchilla &amp; RAG canvases, glossary, themes, and shareable URLs.</p>
     </header>
 
     <main>
@@ -794,12 +795,12 @@
 
     </main>
     
-    <footer>
-        <p><a href="index.html" style="color:var(--chover)">Hub</a> · LLM Parameter Lab · MIT</p>
+    <footer id="site-footer">
+        <div id="references-section" class="references-section"></div>
+        <p class="site-footer-meta"><a href="index.html" style="color:var(--chover)">Hub</a> · LLM Parameter Lab · MIT</p>
     </footer>
 
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script defer src="assets/lab-shared.js"></script>
+    <script src="assets/lab-shared.js?v=2.1.0"></script>
     <script>
         function formatGB(gb) { return gb >= 1 ? gb.toFixed(1) + ' GB' : (gb * 1024).toFixed(0) + ' MB'; }
         function renderBars(containerId, data) {
@@ -1088,6 +1089,22 @@
         ['s-comp', 's-tflop', 's-mfu', 's-tpp'].forEach(id => document.getElementById(id).addEventListener('input', updateScaling));
         updateScaling();
 
+        function onLabWidgetUpdate() {
+            if (window.LabShared) {
+                window.LabShared.drawChinchilla();
+                window.LabShared.drawRagSankey();
+            }
+        }
+        ['s-comp', 's-tflop', 's-mfu', 's-tpp', 'rag-k', 'rag-chunk', 'rag-ctx', 'rag-corp'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', onLabWidgetUpdate);
+        });
+
+    </script>
+    <script>
+        window.addEventListener('load', function () {
+            if (window.LabShared) window.LabShared.bootLab();
+        });
     </script>
 </body>
 </html>

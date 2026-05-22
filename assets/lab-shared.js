@@ -29,6 +29,23 @@
     scaling: String.raw`L(N,D) = \frac{A}{N^\alpha} + \frac{B}{D^\beta} + L_\infty`,
   };
 
+  const LAB_VERSION = '2.1.0';
+
+  const REFERENCES = [
+    { widget: 'kv-cache', cite: 'Vaswani et al. (2017). Attention Is All You Need. NeurIPS.', url: 'https://arxiv.org/abs/1706.03762' },
+    { widget: 'kv-cache', cite: 'Dao et al. (2022). FlashAttention. NeurIPS.', url: 'https://arxiv.org/abs/2205.14135' },
+    { widget: 'quantization', cite: 'Jacob et al. (2018). Quantization and Training of CNNs for Efficient Integer-Arithmetic-Only Inference. CVPR.', url: 'https://arxiv.org/abs/1712.05877' },
+    { widget: 'quantization', cite: 'Frantar et al. (2023). GPTQ: Accurate Post-Training Quantization for GPT.', url: 'https://arxiv.org/abs/2210.17323' },
+    { widget: 'temperature', cite: 'Holtzman et al. (2020). The Curious Case of Neural Text Degeneration (nucleus sampling). ICLR.', url: 'https://arxiv.org/abs/1904.09751' },
+    { widget: 'temperature', cite: 'Fan et al. (2018). Hierarchical Neural Story Generation (top-k). ACL.', url: 'https://arxiv.org/abs/1805.04833' },
+    { widget: 'rlhf', cite: 'Ouyang et al. (2022). Training language models to follow instructions with human feedback (InstructGPT). NeurIPS.', url: 'https://arxiv.org/abs/2203.02155' },
+    { widget: 'rlhf', cite: 'Rafailov et al. (2023). Direct Preference Optimization (DPO). NeurIPS.', url: 'https://arxiv.org/abs/2305.18290' },
+    { widget: 'rag', cite: 'Lewis et al. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. NeurIPS.', url: 'https://arxiv.org/abs/2005.11401' },
+    { widget: 'scaling', cite: 'Kaplan et al. (2020). Scaling Laws for Neural Language Models. arXiv.', url: 'https://arxiv.org/abs/2001.08361' },
+    { widget: 'scaling', cite: 'Hoffmann et al. (2022). Training Compute-Optimal Large Language Models (Chinchilla). NeurIPS.', url: 'https://arxiv.org/abs/2203.15556' },
+    { widget: 'scaling', cite: 'Brown et al. (2020). Language Models are Few-Shot Learners (GPT-3). NeurIPS.', url: 'https://arxiv.org/abs/2005.14165' },
+  ];
+
   const GLOSSARY = [
     { term: 'KV cache', def: 'Stored key/value tensors per layer so autoregressive decoding does not recompute past tokens.' },
     { term: 'Quantization', def: 'Compressing weights to fewer bits (e.g. Q4_K_M) to reduce VRAM with small perplexity cost.' },
@@ -50,6 +67,7 @@
 
   let i18n = {};
   let lang = localStorage.getItem('lab-lang') || 'en';
+  let booted = false;
 
   function assetBase() {
     const path = location.pathname.replace(/\/[^/]*$/, '');
@@ -177,6 +195,7 @@
       <span class="sep">|</span>
       <a href="llm-lab.html">Lab</a>
       <a href="enhanced-toolkit.html">Toolkit</a>
+      <span class="lab-version-badge">v${LAB_VERSION}</span>
       <span class="sep hide-mobile">|</span>
       <button type="button" id="lab-glossary-btn" data-i18n="toolbar.glossary">Glossary</button>
       <button type="button" id="lab-theme-btn" data-i18n="toolbar.theme">Theme</button>
@@ -227,6 +246,27 @@
 
   function toggleGlossary() {
     document.body.classList.toggle('glossary-open');
+  }
+
+  function renderReferences() {
+    const host = document.getElementById('references-section');
+    if (!host || host.dataset.filled) return;
+    host.dataset.filled = '1';
+    const byWidget = {};
+    REFERENCES.forEach((r) => {
+      if (!byWidget[r.widget]) byWidget[r.widget] = [];
+      byWidget[r.widget].push(r);
+    });
+    let html = '<h3 class="references-title">Research references</h3><p class="references-lead">Formulas and sliders in this lab are inspired by the following work (educational approximations, not reproductions).</p>';
+    Object.entries(byWidget).forEach(([widget, refs]) => {
+      const label = widget.replace(/-/g, ' ');
+      html += `<details class="references-group"><summary>${label}</summary><ol>`;
+      refs.forEach((r) => {
+        html += `<li><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.cite}</a></li>`;
+      });
+      html += '</ol></details>';
+    });
+    host.innerHTML = html;
   }
 
   function renderKatex() {
@@ -649,12 +689,26 @@
     if (w) scrollToWidget(w);
   }
 
+  function waitForKatex(maxMs = 5000) {
+    return new Promise((resolve) => {
+      if (typeof katex !== 'undefined') { resolve(); return; }
+      const t0 = Date.now();
+      const tick = () => {
+        if (typeof katex !== 'undefined' || Date.now() - t0 > maxMs) resolve();
+        else requestAnimationFrame(tick);
+      };
+      tick();
+    });
+  }
+
   async function initLabPage() {
     renderToolbar();
     renderGlossary();
+    renderReferences();
     applyTheme(localStorage.getItem('lab-theme') || 'light');
     await loadI18n(lang);
     injectFormulas();
+    await waitForKatex();
     renderKatex();
     injectKvExtras();
     injectVizCanvases();
@@ -665,16 +719,14 @@
     injectCanvasExport('scaling', 'chinchilla-canvas');
     injectCanvasExport('rag', 'rag-sankey-canvas');
 
-    setTimeout(() => {
-      drawChinchilla();
-      drawRagSankey();
-    }, 200);
+    drawChinchilla();
+    drawRagSankey();
 
     const obs = new MutationObserver(() => {
       drawChinchilla();
       drawRagSankey();
     });
-    ['s-n', 's-d', 'kv-cache-ram'].forEach((id) => {
+    ['s-n', 's-d', 'kv-cache-ram', 'scale-output', 'rag-output'].forEach((id) => {
       const el = document.getElementById(id);
       if (el) obs.observe(el, { childList: true, characterData: true, subtree: true });
     });
@@ -683,25 +735,34 @@
   async function initHubPage() {
     renderToolbar();
     renderGlossary();
+    renderReferences();
     applyTheme(localStorage.getItem('lab-theme') || 'light');
     await loadI18n(lang);
     document.getElementById('lab-lang-select')?.addEventListener('change', (e) => loadI18n(e.target.value));
   }
 
+  async function bootLab() {
+    if (booted) return;
+    booted = true;
+    document.body.classList.add('lab-page');
+    await initLabPage();
+  }
+
+  async function bootHub() {
+    if (booted) return;
+    booted = true;
+    await initHubPage();
+  }
+
   global.LabShared = {
+    version: LAB_VERSION,
     initLabPage,
     initHubPage,
+    bootLab,
+    bootHub,
     drawChinchilla,
     drawRagSankey,
     scrollToWidget,
     loadI18n,
   };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    if (document.body.classList.contains('hub-page')) initHubPage();
-    else if (document.body.classList.contains('lab-page') || document.querySelector('.tool-section, .widget')) {
-      document.body.classList.add('lab-page');
-      initLabPage();
-    }
-  });
 })(typeof window !== 'undefined' ? window : globalThis);
