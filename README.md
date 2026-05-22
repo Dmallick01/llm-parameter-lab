@@ -1,27 +1,64 @@
 # LLM Parameter Lab
 
+[![GitHub Pages](https://img.shields.io/badge/demo-GitHub%20Pages-blue?style=flat-square)](https://dmallick01.github.io/llm-parameter-lab/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 **One line:** Interactive, zero-backend dashboards for LLM systems — KV cache, quantization, sampling, RLHF, RAG budgets, and scaling laws.
 
 ## Live demo
 
-Enable GitHub Pages on this repo (branch `main`, root `/`), then open:
+**[https://dmallick01.github.io/llm-parameter-lab/](https://dmallick01.github.io/llm-parameter-lab/)**
 
-`https://YOUR_USER.github.io/llm-parameter-lab/llm-lab.html`
-
-Or locally:
-
-```bash
-python3 -m http.server 8080
-# → http://localhost:8080/llm-lab.html
-```
+GitHub Pages deploys the Vite `dist/` build on every push to `main`. Enable Pages once: repo **Settings → Pages → Source: GitHub Actions**.
 
 ## Portals
 
-| File | Topics |
+| Page | Topics |
 |------|--------|
-| [llm-lab.html](llm-lab.html) | KV cache RAM, quantization, logit decoders / sampling |
-| [enhanced-toolkit.html](enhanced-toolkit.html) | RLHF objective, RAG context budget, Chinchilla scaling |
-| [index.html](index.html) | Redirect hub |
+| [index.html](index.html) | Hub, learning path, deep links |
+| [llm-lab.html](llm-lab.html) | Full lab: KV, quant, sampling, RLHF, RAG, Chinchilla |
+| [enhanced-toolkit.html](enhanced-toolkit.html) | Compact layout + Wikipedia search demo |
+
+### Deep links
+
+Open a widget directly:
+
+- `llm-lab.html?widget=kv-cache`
+- `llm-lab.html?widget=quantization`
+- `llm-lab.html?widget=temperature`
+- `llm-lab.html?widget=rlhf`
+- `llm-lab.html?widget=rag`
+- `llm-lab.html?widget=scaling`
+
+Slider state is stored in the URL hash; use **Copy link** in the toolbar to share.
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| KaTeX | Rendered formulas under each widget |
+| Challenge mode | Guess KV cache RAM before revealing (lab page) |
+| Presets | One-click 7B / 70B / 405B architectures |
+| Theme | Light / dark toggle (persisted) |
+| Glossary | Searchable sidebar (EN, ES UI strings) |
+| Viz | Chinchilla loss canvas, RAG budget sankey |
+| Export | PNG from canvases and metric panels |
+
+## Local dev
+
+```bash
+# Static (no build)
+python3 -m http.server 8080
+# → http://localhost:8080/
+
+# Vite dev server
+npm install
+npm run dev
+
+# Production bundle
+npm run build
+npm run preview   # serves dist/
+```
 
 ## Flow
 
@@ -30,6 +67,7 @@ flowchart LR
   U[User sliders] --> W[Widget math]
   W --> C[Canvas / DOM viz]
   C --> R[Real-time readout]
+  H[URL hash] <--> U
 ```
 
 ## Widgets & formulas
@@ -47,11 +85,9 @@ flowchart LR
 |-------------------------|----------------|
 | ![LLM Lab](docs/screenshots/llm-lab.png) | ![Toolkit](docs/screenshots/enhanced-toolkit.png) |
 
-*(Regenerate with `python3 -m http.server` in repo root and capture the viewports.)*
-
 ## Tech stack
 
-Vanilla JS · HTML5 Canvas · CSS variables · no build step
+Vanilla JS · HTML5 Canvas · KaTeX · CSS variables · optional Vite bundle
 
 ## License
 

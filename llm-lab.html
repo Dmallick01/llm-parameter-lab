@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Systems Laboratory</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/lab-shared.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
     <style>
         :root {
             --cbg: #ffffff;
@@ -320,9 +322,17 @@
             border-top: 1px solid var(--ctext);
             color: var(--cdisabled);
         }
+
+        [data-theme="dark"] {
+            --cbg: #0a0a0a;
+            --ctext: #f0f0f0;
+            --cdisabled: #888888;
+            --chover: #6b9fff;
+            --ctrigger: #1a2e1a;
+        }
     </style>
 </head>
-<body>
+<body class="lab-page">
 
     <header>
         <h1>LLM Parameter Lab</h1>
@@ -349,14 +359,14 @@
                             <span class="control-label">Model Parameters</span>
                             <span class="control-value" id="kv-params-val">7B</span>
                         </div>
-                        <input type="range" id="kv-params" min="1" max="200" value="7">
+                        <input type="range" id="kv-params" min="1" max="450" value="7">
                     </div>
                     <div class="control-item">
                         <div class="control-header">
                             <span class="control-label">Layers (L)</span>
                             <span class="control-value" id="kv-layers-val">32</span>
                         </div>
-                        <input type="range" id="kv-layers" min="8" max="120" step="2" value="32">
+                        <input type="range" id="kv-layers" min="8" max="128" step="2" value="32">
                     </div>
                     <div class="control-item">
                         <div class="control-header">
@@ -785,9 +795,11 @@
     </main>
     
     <footer>
-        <p>Gregory Page Theme / LLM Parameter Lab 2026</p>
+        <p><a href="index.html" style="color:var(--chover)">Hub</a> · LLM Parameter Lab · MIT</p>
     </footer>
 
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="assets/lab-shared.js"></script>
     <script>
         function formatGB(gb) { return gb >= 1 ? gb.toFixed(1) + ' GB' : (gb * 1024).toFixed(0) + ' MB'; }
         function renderBars(containerId, data) {

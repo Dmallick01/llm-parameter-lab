@@ -1,0 +1,23 @@
+{
+  "toolbar.home": "Hub",
+  "toolbar.glossary": "Glossary",
+  "toolbar.theme": "Theme",
+  "toolbar.share": "Copy link",
+  "toolbar.lang": "Language",
+  "challenge.title": "Challenge: predict KV cache RAM (GB)",
+  "challenge.guess": "Your guess (GB)",
+  "challenge.check": "Reveal answer",
+  "challenge.close": "Close",
+  "challenge.start": "Challenge mode",
+  "preset.7b": "7B preset",
+  "preset.70b": "70B preset",
+  "preset.405b": "405B preset",
+  "export.png": "Export PNG",
+  "hub.title": "LLM Parameter Lab",
+  "hub.lead": "Interactive, zero-backend teaching tools for LLM systems — memory, quantization, sampling, alignment, RAG, and scaling laws.",
+  "hub.card.lab": "Systems Laboratory",
+  "hub.card.lab.desc": "Six widgets with live metrics, Chinchilla curve, and RAG budget sankey.",
+  "hub.card.toolkit": "Enhanced Toolkit",
+  "hub.card.toolkit.desc": "Alternate layout with Wikipedia search demo and compact controls.",
+  "hub.path": "Suggested learning path"
+}
