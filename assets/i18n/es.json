@@ -1,0 +1,23 @@
+{
+  "toolbar.home": "Inicio",
+  "toolbar.glossary": "Glosario",
+  "toolbar.theme": "Tema",
+  "toolbar.share": "Copiar enlace",
+  "toolbar.lang": "Idioma",
+  "challenge.title": "Reto: predice la RAM del KV cache (GB)",
+  "challenge.guess": "Tu estimación (GB)",
+  "challenge.check": "Mostrar respuesta",
+  "challenge.close": "Cerrar",
+  "challenge.start": "Modo reto",
+  "preset.7b": "Preset 7B",
+  "preset.70b": "Preset 70B",
+  "preset.405b": "Preset 405B",
+  "export.png": "Exportar PNG",
+  "hub.title": "Laboratorio de parámetros LLM",
+  "hub.lead": "Herramientas interactivas sin backend para sistemas LLM: memoria, cuantización, muestreo, alineación, RAG y leyes de escala.",
+  "hub.card.lab": "Laboratorio de sistemas",
+  "hub.card.lab.desc": "Seis widgets con métricas en vivo, curva Chinchilla y sankey de presupuesto RAG.",
+  "hub.card.toolkit": "Kit mejorado",
+  "hub.card.toolkit.desc": "Diseño alternativo con búsqueda Wikipedia y controles compactos.",
+  "hub.path": "Ruta de aprendizaje sugerida"
+}

@@ -2,10 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=llm-lab.html">
-  <title>LLM Parameter Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Parameter Lab — Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/lab-shared.css">
 </head>
-<body>
-  <p><a href="llm-lab.html">Open LLM Systems Laboratory</a></p>
+<body class="hub-page hub-body">
+  <a href="https://dmallick01.github.io/llm-parameter-lab/" class="hub-badge" title="Live demo on GitHub Pages">
+    <img src="https://img.shields.io/badge/demo-GitHub%20Pages-blue?style=flat-square" alt="GitHub Pages demo">
+  </a>
+
+  <h1 data-i18n="hub.title">LLM Parameter Lab</h1>
+  <p class="hub-lead" data-i18n="hub.lead">Interactive, zero-backend teaching tools for LLM systems — memory, quantization, sampling, alignment, RAG, and scaling laws.</p>
+
+  <div class="hub-cards">
+    <a class="hub-card" href="llm-lab.html">
+      <h2 data-i18n="hub.card.lab">Systems Laboratory</h2>
+      <p data-i18n="hub.card.lab.desc">Six widgets with live metrics, Chinchilla curve, and RAG budget sankey.</p>
+      <span class="tag">llm-lab.html</span>
+    </a>
+    <a class="hub-card" href="enhanced-toolkit.html">
+      <h2 data-i18n="hub.card.toolkit">Enhanced Toolkit</h2>
+      <p data-i18n="hub.card.toolkit.desc">Alternate layout with Wikipedia search demo and compact controls.</p>
+      <span class="tag">enhanced-toolkit.html</span>
+    </a>
+  </div>
+
+  <section class="hub-path">
+    <h2 data-i18n="hub.path">Suggested learning path</h2>
+    <ol>
+      <li><a href="llm-lab.html?widget=kv-cache">KV cache</a> — how attention memory scales with context</li>
+      <li><a href="llm-lab.html?widget=quantization">Quantization</a> — bits-per-weight vs quality</li>
+      <li><a href="llm-lab.html?widget=temperature">Sampling</a> — temperature, top-p, top-k</li>
+      <li><a href="llm-lab.html?widget=rlhf">RLHF</a> — reward vs KL penalty</li>
+      <li><a href="llm-lab.html?widget=rag">RAG budget</a> — retrieval vs generation tokens</li>
+      <li><a href="llm-lab.html?widget=scaling">Chinchilla scaling</a> — compute-optimal N and D</li>
+      <li><a href="enhanced-toolkit.html?widget=search">Wikipedia retrieval demo</a> — live API lookup</li>
+    </ol>
+
+    <div class="hub-widgets" aria-label="Deep links">
+      <a href="llm-lab.html?widget=kv-cache">kv-cache</a>
+      <a href="llm-lab.html?widget=quantization">quantization</a>
+      <a href="llm-lab.html?widget=temperature">temperature</a>
+      <a href="llm-lab.html?widget=rlhf">rlhf</a>
+      <a href="llm-lab.html?widget=rag">rag</a>
+      <a href="llm-lab.html?widget=scaling">scaling</a>
+    </div>
+  </section>
+
+  <footer style="margin-top:48px;color:var(--cdisabled);font-size:12px;">
+    MIT License · <a href="https://github.com/Dmallick01/llm-parameter-lab" style="color:var(--chover)">github.com/Dmallick01/llm-parameter-lab</a>
+  </footer>
+
+  <script src="assets/lab-shared.js"></script>
 </body>
 </html>

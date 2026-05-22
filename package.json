@@ -1,0 +1,14 @@
+{
+  "name": "llm-parameter-lab",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Interactive zero-backend LLM teaching dashboards",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && cp assets/lab-shared.js assets/lab-shared.css dist/assets/ && mkdir -p dist/assets/i18n && cp assets/i18n/*.json dist/assets/i18n/",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  }
+}

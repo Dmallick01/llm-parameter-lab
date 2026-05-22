@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Interactive Toolkit – Enhanced</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/lab-shared.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
     <style>
         :root {
             --cbg: #ffffff;
@@ -68,6 +70,15 @@
         details { margin-top: 20px; color: var(--ctext); padding: 15px; border: 1px solid var(--ctext); }
         summary { cursor: pointer; font-weight: bold; margin-bottom: 10px; }
 
+        .formula-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--ctrigger);
+            border: 1px solid var(--ctext);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
         /* Graph Bars */
         .bar-chart-container { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
         .bar-row { display: flex; align-items: center; }
@@ -75,14 +86,23 @@
         .bar-track { flex: 1; height: 1px; background: var(--cdisabled); margin: 0 15px; position: relative; }
         .bar-fill { position: absolute; left: 0; top: -4px; height: 9px; background: var(--ctext); transition: width 0.3s; }
         .bar-value { width: 80px; text-align: right; }
+
+        [data-theme="dark"] {
+            --cbg: #0a0a0a;
+            --ctext: #f0f0f0;
+            --cdisabled: #888888;
+            --chover: #6b9fff;
+            --ctrigger: #1a2e1a;
+        }
     </style>
 </head>
-<body>
+<body class="lab-page">
 
 <h1>LLM Interactive Toolkit</h1>
+<p style="color:var(--cdisabled);margin-bottom:40px;"><a href="index.html" style="color:var(--chover)">← Hub</a> · Compact alternate layout · <a href="llm-lab.html" style="color:var(--chover)">Full lab</a></p>
 
 <!-- Search & Quick Research -->
-<div class="widget" id="search-widget">
+<div class="widget" id="search-widget" data-widget="search-widget">
     <div class="widget-header">
         <h2>Search & Quick Research</h2>
         <p>API retrieval simulation.</p>
@@ -100,10 +120,11 @@
 </div>
 
 <!-- KV Cache Analyzer -->
-<div class="widget" id="kv-widget">
+<div class="widget" id="kv-widget" data-widget="kv-cache">
     <div class="widget-header">
         <h2>KV Cache Analyzer</h2>
         <p>Attention memory profiling.</p>
+        <div class="formula-box">RAM ≈ 2 × L × H × d<sub>h</sub> × n<sub>ctx</sub> × bytes</div>
     </div>
     <div class="controls">
         <div class="row">
@@ -138,7 +159,7 @@
 </div>
 
 <!-- Quantization Calibrator -->
-<div class="widget" id="quant-widget">
+<div class="widget" id="quant-widget" data-widget="quantization">
     <div class="widget-header">
         <h2>Quantization Calibrator</h2>
         <p>Tradeoff analysis.</p>
@@ -164,7 +185,7 @@
 </div>
 
 <!-- Sampling Dial -->
-<div class="widget" id="temp-widget">
+<div class="widget" id="temp-widget" data-widget="temperature">
     <div class="widget-header">
         <h2>Sampling Dial</h2>
         <p>Stochasticity control.</p>
@@ -190,7 +211,7 @@
 </div>
 
 <!-- RLHF Alignment -->
-<div class="widget" id="rlhf-widget">
+<div class="widget" id="rlhf-widget" data-widget="rlhf">
     <div class="widget-header">
         <h2>RLHF Alignment</h2>
         <p>Policy tuning.</p>
@@ -212,7 +233,7 @@
 </div>
 
 <!-- RAG Optimizer -->
-<div class="widget" id="rag-widget">
+<div class="widget" id="rag-widget" data-widget="rag">
     <div class="widget-header">
         <h2>RAG Optimizer</h2>
         <p>Retrieval context scaling.</p>
@@ -238,7 +259,7 @@
 </div>
 
 <!-- Scaling Laws -->
-<div class="widget" id="scale-widget">
+<div class="widget" id="scale-widget" data-widget="scaling">
     <div class="widget-header">
         <h2>Scaling Laws</h2>
         <p>Compute optimization.</p>
@@ -255,6 +276,8 @@
     </div>
 </div>
 
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="assets/lab-shared.js"></script>
 <script>
 function formatBytes(b) {
     if (b < 1024*1024) return (b/1024).toFixed(2) + ' KB';
@@ -437,6 +460,22 @@ function updateScale() {
 }
 scale.compute.oninput = updateScale;
 updateScale();
+
+if (window.LabShared) {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      window.LabShared.drawChinchilla?.();
+      window.LabShared.drawRagSankey?.();
+    }, 300);
+  });
+  ['layers','heads','headDim','ctx','dtype','kDocs','chunkSize','corpusSize','compute'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      window.LabShared.drawChinchilla?.();
+      window.LabShared.drawRagSankey?.();
+    });
+  });
+}
 
 // Search
 const searchBox = document.getElementById('search-box');
